@@ -1,0 +1,43 @@
+#Author:songwill
+# -*- coding:utf-8 -*-
+
+import urllib
+import urllib2
+import re
+from bs4 import BeautifulSoup
+
+#下载网页内容
+def gethtml(url):
+    request=urllib2.Request(url)
+    response=urllib2.urlopen(request)
+    html=response.read()
+    return html
+
+url="http://www.dce.com.cn/portal/info?cid=1329986308100&iid=1437037589100&type=CMS.NEWS"
+html=gethtml(url)
+
+#解析网页内容，得到单日价格数据
+def getdayprice(html):
+    soup=BeautifulSoup(html)
+    p=soup.find_all("p")
+    #下载整个表数据
+    datalist=[]
+    for item in p:
+        data=item.get_text()
+        datalist.append(data)
+        #print data
+
+    #找到对列数据在列表中位置，并取出数据
+    s2=[6,12,16,21,25,30,34,39,44,50,54,59,63,68,74,78,83,88,93,99,104,107]
+    dayprice=[]
+    for i in s2:
+        dayprice.append(datalist[i-1])
+        print datalist[i-1]
+
+    return dayprice
+    
+dateprice=getdayprice(html)
+
+s1=['日期','上海','上海1','常州','常州1','杭州','杭州1','苏州','无锡',
+    '广州','广州1','汕头','汕头1','佛山','齐鲁化工城','齐鲁化工城1','临沂',
+    '雄县','天津','郑州','武汉','总结']
