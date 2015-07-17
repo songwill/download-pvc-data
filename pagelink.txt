@@ -1,0 +1,39 @@
+ #Author:songwill
+# -*- coding:utf-8 -*-
+
+import urllib
+import urllib2
+import re
+from bs4 import BeautifulSoup
+
+
+def gethtml(url):
+    request=urllib2.Request(url)
+    response=urllib2.urlopen(request)
+    html=response.read()
+    return html
+
+url="http://www.dce.com.cn/portal/cate?cid=1329986308100"
+html=gethtml(url)
+
+def pagelink(html):
+    pagelinks=[]
+    #用正则表达式获取每日市场价格的页面链接，日期
+    patt=re.compile('white-space: nowrap;"><a href="(.*?)" target="_blank">.*?<nobr>(.*?)</nobr>',re.S)
+    links=re.findall(patt,html)
+    for link in links:
+        date=link[1][1:11]
+        pagelink='http://www.dce.com.cn'+link[0]
+        pagelinks.append([date,pagelink])
+    return pagelinks
+
+print pagelink(html)
+#此时打印出的列表呈乱码，求解决
+
+
+#获取每日价格链接时，BeautifulSoup分别获取链接和日期较麻烦
+#soup=BeautifulSoup(html)
+#p=soup.find_all(href=re.compile("CMS.NEWS"))
+#for item in p:
+#    print item.get_text(), "http://www.dce.com.cn/"+item.get('href')
+        
