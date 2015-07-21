@@ -1,0 +1,58 @@
+#Author:songwill
+# -*- coding:utf-8 -*-
+
+import urllib  
+import urllib2
+import cookielib
+import re
+from bs4 import BeautifulSoup
+
+def pagelink(html):
+    pagelinks=[]
+    patt=re.compile('white-space: nowrap;"><a href="(.*?)" target="_blank">.*?<nobr>(.*?)</nobr>',re.S)
+    links=re.findall(patt,html)
+    for link in links:
+        date=link[1][1:11]
+        pagelink='http://www.dce.com.cn'+link[0]
+        pagelinks.append([date,pagelink])
+    return pagelinks
+
+cookie = cookielib.CookieJar()  
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+
+def getpagelink(CurrentPageNum,TotalPageNum):
+    #需要POST的数据#
+    postdata=urllib.urlencode({  
+        'oCid':'1329986308100',
+        'oParentCid':'',
+        'oPage':CurrentPageNum,
+        'allPage':TotalPageNum
+    })
+    #自定义一个请求#
+    req = urllib2.Request(  
+        url = 'http://www.dce.com.cn/portal/cate?cid=1329986308100',  
+        data = postdata
+    )
+    #访问该链接#
+    result = opener.open(req)
+    #打印返回的内容#
+    #print result.read()
+    html=result.read()
+    links=pagelink(html)
+    return links
+
+#print getpagelink(0,296)
+l=[]
+i=0
+for i in range(2):
+    l.append(getpagelink(i,296))
+    print "正在下载第……%d……页" %(i+1)
+
+print l
+
+#参考文章http://blog.csdn.net/pleasecallmewhy/article/details/9305229
+#有待了解的内容：1、提交表单并获取返回内容
+#            2、cookielib.CookieJar()，urllib2.HTTPCookieProcessor()的作用
+
+
+
