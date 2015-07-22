@@ -42,13 +42,18 @@ def getpagelink(CurrentPageNum,TotalPageNum):
     return links
 
 #print getpagelink(0,296)
-l=[]
+linklist=[]
 i=0
-for i in range(2):
-    l.append(getpagelink(i,296))
+for i in range(296):
+    linklist.extend(getpagelink(i,296))
     print "正在下载第……%d……页" %(i+1)
-
-print l
+    
+#print linklist
+f=open('E:/mygit/dec-data/datelinks.txt','w')
+for item in linklist:
+    f.writelines(str(item))
+    f.write('\n')
+f.close()
 
 #参考文章http://blog.csdn.net/pleasecallmewhy/article/details/9305229
 #有待了解的内容：1、提交表单并获取返回内容
