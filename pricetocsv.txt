@@ -1,0 +1,63 @@
+#Author:songwill
+# -*- coding:utf-8 -*-
+
+import urllib
+import urllib2
+import re
+from bs4 import BeautifulSoup
+
+#获取html文档
+def gethtml(url):
+    request=urllib2.Request(url)
+    response=urllib2.urlopen(request)
+    html=response.read()
+    return html
+
+#根据html页面内容，获取价格
+def getdayprice(html):
+    soup=BeautifulSoup(html)
+    p=soup.find_all("p")
+    datalist=[]
+    for item in p:
+        data=item.get_text()
+        datalist.append(data)
+        #print data
+
+    s2=[6,12,16,21,25,30,34,39,44,50,54,59,63,68,74,78,83,88,93,99,104,107]
+    dayprice=[]
+    for i in s2:
+        dayprice.append(datalist[i-1])
+        #print datalist[i-1]
+
+    return dayprice
+#dateprice=getdayprice(html)
+
+#从本地读取链接并下载价格
+pricelist=[]
+fr=open('E:/mygit/dec-data/datelinks.txt','r')
+lines=fr.readlines()
+for i in range(5):
+    linesread=eval(lines[i][:-1])
+    readhtml=gethtml(linesread[1])
+    dateprice=getdayprice(readhtml)
+    #print linesread[0],dateprice[1:]
+    dateprice[0]=linesread[0]       #单页面的日期不显示年份，故替换成下载链接的对应的日期
+    pricelist.append(dateprice)
+fr.close()
+
+
+#写入CSV,若写入txt，总后总结文字符号较多不便处理
+import csv ,codecs     #不导入codecs输出的csv文件中文会显示乱码
+csvfile = file('E:/mygit/dec-data/csv_test.csv', 'wb')
+csvfile.write(codecs.BOM_UTF8)
+writer = csv.writer(csvfile)
+s1=['日期','上海','上海1','常州','常州1','杭州','杭州1','苏州','无锡',
+    '广州','广州1','汕头','汕头1','佛山','齐鲁化工城','齐鲁化工城1','临沂',
+    '雄县','天津','郑州','武汉','总结']
+writer.writerow(s1)
+data = pricelist
+writer.writerows(data) 
+csvfile.close()
+
+#参考资料
+#csv写入乱码：http://blog.csdn.net/lixiang0522/article/details/7755059
