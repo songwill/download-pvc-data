@@ -20,10 +20,13 @@ def getdayprice(html):
     tr=t.find_all("tr")
     td=t.find_all("td")
     s=[]
-    s4=[4,10,14,19,23,28,32,37,42,48,52,57,61,66,72,76,81,86,91,97,104]
+    if len(td)==104:
+        s4=[4,10,14,19,23,28,32,37,42,48,52,57,61,66,72,76,81,86,91,97,102]
+    elif len(td)==108:
+        s4=[4,10,14,19,23,28,32,37,42,48,52,57,61,66,72,76,85,90,96,101,106]
     for i in s4:
         #print td[i-1].text   #列表的第一个元素的序号是0，而不是捕获元素的值，所以i-1
-        s.append(td[i-1].text)
+        s.append(td[i].text)
     dayprice=s
     return dayprice
 #dateprice=getdayprice(html)
@@ -32,13 +35,18 @@ def getdayprice(html):
 pricelist=[]
 fr=open('E:/mygit/dec-data/datelinks.txt','r')
 lines=fr.readlines()
-for i in range(5):
+for i in range(800,827):     #设置下载区间
     linesread=eval(lines[i][:-1])
     readhtml=gethtml(linesread[1])
-    dateprice=getdayprice(readhtml)
-    #print linesread[0],dateprice[1:]
-    dateprice[0]=linesread[0]       #单页面的日期不显示年份，故替换成下载链接的对应的日期
-    pricelist.append(dateprice)
+    try:
+        dateprice=getdayprice(readhtml)
+        #print linesread[0],dateprice[1:]
+        dateprice[0]=linesread[0]       #单页面的日期不显示年份，故替换成下载链接的对应的日期
+        pricelist.append(dateprice)
+        print "……第…%d…页…" %i
+    except:
+        pass
+        print "%d…页【错误】" %i
 fr.close()
 
 
