@@ -26,6 +26,9 @@ def getdayprice(html):
         s4=[4,10,14,19,23,28,32,37,42,48,52,57,61,66,72,76,85,90,96,101,106]
     for i in s4:
         #print td[i-1].text   #列表的第一个元素的序号是0，而不是捕获元素的值，所以i-1
+        string=td[i].text
+        string2=string[1:]    #td[i].text取出的字符带有'\n',需去掉
+        #print string2,type(string2),len(string2)
         s.append(td[i].text)
     dayprice=s
     return dayprice
@@ -65,3 +68,5 @@ csvfile.close()
 
 #参考资料
 #csv写入乱码：http://blog.csdn.net/lixiang0522/article/details/7755059
+#用R读取时x<-read.csv('E:/mygit/dec-data/csv_test.csv',header=T,fileEncoding="UTF-8")，fileEncoding="UTF-8"是关键
+
