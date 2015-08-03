@@ -23,25 +23,66 @@ def getdayprice(html):
     if len(td)==104:
         s4=[4,10,14,19,23,28,32,37,42,48,52,57,61,66,72,76,81,86,91,97,102]
     elif len(td)==108:
-        s4=[4,10,14,19,23,28,32,37,42,48,52,57,61,66,72,76,85,90,96,101,106]
+        s4=[4,10,14,19,23,28,32,37,42,48,52,57,61,66,72,76,85,90,95,101,106]
     for i in s4:
-        #print td[i-1].text   #列表的第一个元素的序号是0，而不是捕获元素的值，所以i-1
-        s.append(td[i].text)
+        #print td[i-1].text ,type(td[i-1].text),len(td[i-1].text)  #列表的第一个元素的序号是0，而不是捕获元素的值，所以i-1
+        string=td[i].text
+        string2=string.strip('\n')
+        #print string2,type(string2),len(string2)
+        s.append(string2)
     dayprice=s
     return dayprice
 #dateprice=getdayprice(html)
+
+#根据html页面内容，获取每日市场情况汇总
+def getdaysummary(html):
+    patt=re.compile('<div id="news_title">(.*?)</div>',re.S)
+    fk=re.findall(patt,html)
+    #print fk,type(fk),len(fk)
+    title=''
+    for f1 in fk:
+        print f1.strip('&nbsp;')
+        title=unicode(f1.strip('&nbsp;'),'gbk')
+        
+    #每日市场汇总在网页中位置不统一，大部分在价格表底部，
+    #但“中国主要市场PVC收盘价格”标题开头的页面中的市场汇总，在表格顶部，所以需分类获取
+    if title.find(u"中国主要")>=0 :
+        patt2=re.compile('<div id="infoContent">.*?&nbsp;(.*?)</DIV>',re.S)
+        fk=re.findall(patt2,html)
+        for item in fk:
+            print item.strip('&nbsp;')
+            feadback=item.strip('&nbsp;')        
+        comment=feadback
+    else:
+        soup=BeautifulSoup(html)
+        spvc=soup.find('span',text=re.compile(r'.*?PVC.*?'))
+        #每日市场总结各格式不同，直接找P标签会出错，先通过关键词PVC找到总结所在节点，在遍历相同节点的span
+        sp=spvc.parent
+        sumr=sp.find_all('span')
+        t=''
+        for item in sumr:
+            f1=item.text
+            f2=f1.strip('\n')
+            t=t+f2
+            fk0=t.strip()
+        comment=fk0
+    print comment
+    return comment
 
 #从本地读取链接并下载价格
 pricelist=[]
 fr=open('E:/mygit/dec-data/datelinks.txt','r')
 lines=fr.readlines()
-for i in range(800,827):     #设置下载区间
+for i in range(17,19):     #设置下载区间
     linesread=eval(lines[i][:-1])
     readhtml=gethtml(linesread[1])
     try:
         dateprice=getdayprice(readhtml)
+        summary=getdaysummary(readhtml)
         #print linesread[0],dateprice[1:]
-        dateprice[0]=linesread[0]       #单页面的日期不显示年份，故替换成下载链接的对应的日期
+        #print summary
+        dateprice[0]=linesread[0]#单页面的日期不显示年份，故替换成下载链接的对应的日期
+        dateprice.append(summary)
         pricelist.append(dateprice)
         print "……第…%d…页…" %i
     except:
@@ -52,16 +93,16 @@ fr.close()
 
 #写入CSV,若写入txt，总后总结文字符号较多不便处理
 import csv ,codecs     #不导入codecs输出的csv文件中文会显示乱码
-csvfile = file('E:/mygit/dec-data/csv_test.csv', 'wb')
+csvfile = open('E:/mygit/dec-data/csv_test.csv', 'wb')
 csvfile.write(codecs.BOM_UTF8)
 writer = csv.writer(csvfile)
 s1=['日期','上海','上海1','常州','常州1','杭州','杭州1','苏州','无锡',
     '广州','广州1','汕头','汕头1','佛山','齐鲁化工城','齐鲁化工城1','临沂',
-    '雄县','天津','郑州','武汉']
+    '雄县','天津','郑州','武汉','总结']
 writer.writerow(s1)
-data = pricelist
-writer.writerows(data) 
+#for item in pricelist:
+#    writer.writerow(item)
+writer.writerows(pricelist)
 csvfile.close()
 
-#参考资料
-#csv写入乱码：http://blog.csdn.net/lixiang0522/article/details/7755059
+#用R读取时x<-read.csv('E:/mygit/dec-data/csv_test.csv',header=T,fileEncoding="UTF-8")，fileEncoding="UTF-8"是关键
