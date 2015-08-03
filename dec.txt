@@ -41,3 +41,44 @@ dateprice=getdayprice(html)
 s1=['日期','上海','上海1','常州','常州1','杭州','杭州1','苏州','无锡',
     '广州','广州1','汕头','汕头1','佛山','齐鲁化工城','齐鲁化工城1','临沂',
     '雄县','天津','郑州','武汉','总结']
+
+#更改
+#_________每个页面格式不统一，后续下载出错，故改代码如下________________
+#Author:songwill
+# -*- coding:utf-8 -*-
+
+import urllib
+import urllib2
+import re
+from bs4 import BeautifulSoup
+
+#获取html文档
+def gethtml(url):
+    request=urllib2.Request(url)
+    response=urllib2.urlopen(request)
+    html=response.read()
+    return html
+#标准格式链接：x月x日中国主要市场PVC收盘价格
+url1="http://www.dce.com.cn/portal/info?cid=1329986308100&iid=1437727742100&type=CMS.NEWS"
+#非标准链接：x月x日中国主要市场PVC收盘价格
+url2="http://www.dce.com.cn/portal/info?cid=1329986308100&iid=1435741667100&type=CMS.NEWS"
+#非价格链接：PVC行业继续亏损
+url3="http://www.dce.com.cn/portal/info?cid=1329986308100&iid=1333070155100&type=CMS.NEWS"
+
+html1=gethtml(url1)
+html2=gethtml(url2)
+html3=gethtml(url3)
+
+soup=BeautifulSoup(html3)
+t=soup.find("tbody")
+tr=t.find_all("tr")
+td=t.find_all("td")
+s=[]
+s4=[4,10,14,19,23,28,32,37,42,48,52,57,61,66,72,76,81,86,91,97,104]
+for i in s4:
+    print td[i].text
+    s.append(td[i].text)
+print s
+
+
+    
