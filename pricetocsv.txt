@@ -46,27 +46,17 @@ def getdaysummary(html):
         
     #每日市场汇总在网页中位置不统一，大部分在价格表底部，
     #但“中国主要市场PVC收盘价格”标题开头的页面中的市场汇总，在表格顶部，所以需分类获取
-    if title.find(u"中国主要")>=0 :
-        patt2=re.compile('<div id="infoContent">.*?&nbsp;(.*?)</DIV>',re.S)
-        fk=re.findall(patt2,html)
-        for item in fk:
-            print item.strip('&nbsp;')
-            feadback=item.strip('&nbsp;')        
-        comment=feadback
+    if title.find(u"(20")>=0 :
+        soup=BeautifulSoup(html)
+        sff=soup.find_all(text=re.compile('PVC'))
+        comment=str(sff[-1].parent.text)
     else:
         soup=BeautifulSoup(html)
         spvc=soup.find('span',text=re.compile(r'.*?PVC.*?'))
         #每日市场总结各格式不同，直接找P标签会出错，先通过关键词PVC找到总结所在节点，在遍历相同节点的span
         sp=spvc.parent
-        sumr=sp.find_all('span')
-        t=''
-        for item in sumr:
-            f1=item.text
-            f2=f1.strip('\n')
-            t=t+f2
-            fk0=t.strip()
-        comment=fk0
-    print comment
+        comment=str(sp.text)
+    #print comment.strip()
     return comment
 
 #从本地读取链接并下载价格
