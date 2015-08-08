@@ -56,6 +56,8 @@ for item in linklist:
 f.close()
 
 #参考文章http://blog.csdn.net/pleasecallmewhy/article/details/9305229
+http://www.crifan.com/files/doc/docbook/python_topic_web_scrape/release/html/python_topic_web_scrape.html
+http://www.crifan.com/files/doc/docbook/web_scrape_emulate_login/release/html/web_scrape_emulate_login.html
 #有待了解的内容：1、提交表单并获取返回内容
 #            2、cookielib.CookieJar()，urllib2.HTTPCookieProcessor()的作用
 
